@@ -24,14 +24,24 @@ let newsLetterSchema = new mongoose.Schema({
     email: {type: String, required: true}
   });
 
+let messageSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    subject: {type: String, required: true},
+    email: {type: String, required: true},
+    message: {type: String, required: true}
+  });
+
 let Subscription = mongoose.model('Subscription', newsLetterSchema); 
+
+let Message = mongoose.model('Message', messageSchema); 
 
 
 app.post("/news-letter/subscribtion", (request, response) => {
 
 let newUser = new Subscription({name: request.body.name,
 surname: request.body.surname,
-email: request.body.email})
+email: request.body.email
+})
 
 newUser.save((error, data) => {
   if(!error){
@@ -48,6 +58,31 @@ newUser.save((error, data) => {
   }
 })
 
+
+});
+
+
+app.post("/contact/message", (request, response) => {
+  let userMessage = new Message({name: request.body.name,
+    subject: request.body.subject,
+    email: request.body.email,
+    message: request.body.message
+  })
+
+  userMessage.save((error, data) => {
+    if(!error){
+      let responseObj = {};
+      responseObj['name'] = data.name;
+      responseObj['subject'] = data.subject;
+      responseObj['email'] = data.email;
+     responseObj['message'] = data.message;
+  
+      response.sendFile('message.html', { root: __dirname});
+    }
+    else{
+      response.json({"error": "message not sent"})
+    }
+  })
 
 });
 
@@ -116,7 +151,7 @@ app.get('/contact-us', (req, res) => {
 });
 
 app.get('/recent-blog', (req, res) => {
-  res.sendFile('/recent-blog.html');
+  res.sendFile('/recent-blog.html', { root: __dirname});
 });
 
 app.get('/recent', (req, res) => {
